@@ -21,7 +21,7 @@ MalenaDJ es un bot de Discord escrito en Python que permite reproducir música d
 - Python 3.8 o superior
 - FFmpeg instalado en el sistema o en la carpeta raíz del proyecto
 - Token de bot de Discord
-- Ya no se requiere token de Genius API (ahora usamos LRCLib para letras sincronizadas)
+- Genius API, se usa LRCLib para letras sincronizadas. En caso de fallo se usa Genius
 - Las siguientes bibliotecas de Python:
   - discord.py[voice]
   - yt-dlp (reemplazo mejorado de youtube_dl)
