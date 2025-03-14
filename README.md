@@ -101,10 +101,6 @@ Todos los comandos utilizan el formato de comandos de barra (`/`)
 
 El bot busca automáticamente las letras de las canciones que reproduzcas utilizando LRCLib. Si encuentra letras sincronizadas (con marcas de tiempo), las mostrará en tiempo real a medida que avanza la canción.
 
-## Desconexión Automática
-
-El bot se desconectará automáticamente después de 30 segundos si se queda solo en un canal de voz (sin usuarios humanos), ahorrando recursos del servidor.
-
 ## Solución de problemas
 
 - **El bot no reproduce audio**: Asegúrate de tener FFmpeg instalado correctamente
