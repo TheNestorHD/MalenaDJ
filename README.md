@@ -125,8 +125,8 @@ El bot incluye un modo radio que permite la reproducción automática de cancion
 
 1. Usa el comando `/radio` para alternar el estado del modo radio
 2. Cuando está activado, el bot buscará automáticamente canciones relacionadas con la última canción reproducida
-3. Se añadirán hasta 3 canciones similares a la cola de reproducción
-4. El modo radio permanecerá activo hasta que lo desactives manualmente
+3. Se añadirán hasta 5 canciones similares a la cola de reproducción
+4. El modo radio permanecerá activo hasta que lo desactives manualmente o hasta que el bot sea desconectado
 
 Esta función es ideal para mantener la música sonando sin tener que añadir canciones manualmente constantemente.
 
