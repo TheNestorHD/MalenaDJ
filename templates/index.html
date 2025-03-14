@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MalenaDJ - Panel de Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e1e1e1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #1e1e1e !important;
+            border-bottom: 1px solid #333;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #252525;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .table {
+            color: #e1e1e1;
+        }
+        .table td, .table th {
+            border-color: #333;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-online {
+            background-color: #28a745;
+        }
+        .status-offline {
+            background-color: #dc3545;
+        }
+        .refresh-btn {
+            cursor: pointer;
+        }
+        .server-card {
+            transition: all 0.3s ease;
+        }
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .stats-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stats-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        .uptime {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+        .radio-badge {
+            background-color: #6f42c1;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        .listeners-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .listeners-list li {
+            margin-bottom: 3px;
+        }
+        .song-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .song-title {
+            font-weight: bold;
+        }
+        .song-artist {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-music-note-beamed"></i> MalenaDJ - Panel de Control
+            </a>
+            <div class="ms-auto">
+                <span class="uptime" id="uptime">Tiempo activo: Calculando...</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-hdd-rack fs-1 mb-2 text-primary"></i>
+                        <div class="stats-value" id="server-count">0</div>
+                        <div class="stats-label">Servidores</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-headphones fs-1 mb-2 text-success"></i>
+                        <div class="stats-value" id="voice-channel-count">0</div>
+                        <div class="stats-label">Canales de Voz</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-music-note-list fs-1 mb-2 text-warning"></i>
+                        <div class="stats-value" id="queue-count">0</div>
+                        <div class="stats-label">Canciones en Cola</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-people fs-1 mb-2 text-info"></i>
+                        <div class="stats-value" id="listener-count">0</div>
+                        <div class="stats-label">Oyentes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-music-note-beamed"></i> Reproducción Actual</span>
+                        <i class="bi bi-arrow-clockwise refresh-btn" onclick="fetchStats()"></i>
+                    </div>
+                    <div class="card-body">
+                        <div id="current-songs-container">
+                            <p class="text-muted">No hay canciones reproduciéndose actualmente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-list-ol"></i> Colas de Reproducción</span>
+                        <i class="bi bi-arrow-clockwise refresh-btn" onclick="fetchStats()"></i>
+                    </div>
+                    <div class="card-body">
+                        <div id="queue-container">
+                            <p class="text-muted">No hay colas de reproducción activas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-hdd-rack"></i> Servidores Conectados</span>
+                        <i class="bi bi-arrow-clockwise refresh-btn" onclick="fetchStats()"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="servers-container">
+                            <p class="text-muted">No hay servidores conectados.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let lastUpdateTime = new Date();
+        let startTime = new Date();
+
+        // Función para formatear la duración
+        function formatDuration(seconds) {
+            const days = Math.floor(seconds / (3600 * 24));
+            const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+
+            let result = '';
+            if (days > 0) result += `${days}d `;
+            if (hours > 0) result += `${hours}h `;
+            if (minutes > 0) result += `${minutes}m `;
+            result += `${secs}s`;
+
+            return result;
+        }
+
+        // Función para actualizar el tiempo de actividad
+        function updateUptime() {
+            const now = new Date();
+            const uptimeSeconds = Math.floor((now - startTime) / 1000);
+            document.getElementById('uptime').textContent = `Tiempo activo: ${formatDuration(uptimeSeconds)}`;
+        }
+
+        // Función para extraer artista y título de una canción
+        function extractSongInfo(songTitle) {
+            // Intentar separar por el formato común "Artista - Título"
+            let artist = "Desconocido";
+            let title = songTitle;
+            
+            if (songTitle.includes(' - ')) {
+                const parts = songTitle.split(' - ', 2);
+                artist = parts[0].trim();
+                title = parts[1].trim();
+            }
+            
+            return { artist, title };
+        }
+
+        // Función para obtener estadísticas del bot
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                // Actualizar tiempos
+                if (data.start_time) {
+                    startTime = new Date(data.start_time);
+                }
+                if (data.last_update) {
+                    lastUpdateTime = new Date(data.last_update);
+                }
+                
+                // Actualizar contadores
+                document.getElementById('server-count').textContent = data.servers.length;
+                document.getElementById('voice-channel-count').textContent = data.voice_channels.length;
+                
+                // Calcular total de canciones en cola
+                let totalQueueSongs = 0;
+                for (const serverId in data.queue) {
+                    totalQueueSongs += data.queue[serverId].length;
+                }
+                document.getElementById('queue-count').textContent = totalQueueSongs;
+                
+                // Calcular total de oyentes
+                let totalListeners = 0;
+                for (const channelId in data.listeners) {
+                    totalListeners += data.listeners[channelId].length;
+                }
+                document.getElementById('listener-count').textContent = totalListeners;
+                
+                // Mostrar canciones actuales
+                const currentSongsContainer = document.getElementById('current-songs-container');
+                if (Object.keys(data.current_songs).length > 0) {
+                    let html = '<div class="list-group">';
+                    for (const serverId in data.current_songs) {
+                        const song = data.current_songs[serverId];
+                        const serverName = data.servers.find(s => s.id === serverId)?.name || 'Servidor Desconocido';
+                        const songInfo = extractSongInfo(song.title);
+                        
+                        html += `
+                            <div class="list-group-item bg-dark text-light border-secondary">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6>${serverName}</h6>
+                                </div>
+                                <div class="song-info">
+                                    <span class="song-title">${songInfo.title}</span>
+                                    <span class="song-artist">${songInfo.artist}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    currentSongsContainer.innerHTML = html;
+                } else {
+                    currentSongsContainer.innerHTML = '<p class="text-muted">No hay canciones reproduciéndose actualmente.</p>';
+                }
+                
+                // Mostrar colas de reproducción
+                const queueContainer = document.getElementById('queue-container');
+                if (Object.keys(data.queue).length > 0) {
+                    let html = '';
+                    for (const serverId in data.queue) {
+                        const queue = data.queue[serverId];
+                        const serverName = data.servers.find(s => s.id === serverId)?.name || 'Servidor Desconocido';
+                        
+                        if (queue.length > 0) {
+                            html += `
+                                <div class="mb-3">
+                                    <h6>${serverName}</h6>
+                                    <ol class="list-group">
+                            `;
+                            
+                            queue.forEach((song, index) => {
+                                // Extraer información de la canción
+                                let songTitle = typeof song === 'string' ? song : song.title || 'Canción desconocida';
+                                
+                                // Si es una URL de YouTube, intentar extraer el ID del video
+                                if (typeof song === 'string' && song.includes('youtube.com/watch?v=')) {
+                                    songTitle = 'Canción de YouTube';
+                                }
+                                
+                                const songInfo = extractSongInfo(songTitle);
+                                
+                                html += `
+                                    <li class="list-group-item bg-dark text-light border-secondary">
+                                        <div class="song-info">
+                                            <span class="song-title">${songInfo.title}</span>
+                                            <span class="song-artist">${songInfo.artist}</span>
+                                        </div>
+                                    </li>
+                                `;
+                            });
+                            
+                            html += `
+                                    </ol>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    if (html) {
+                        queueContainer.innerHTML = html;
+                    } else {
+                        queueContainer.innerHTML = '<p class="text-muted">No hay canciones en cola.</p>';
+                    }
+                } else {
+                    queueContainer.innerHTML = '<p class="text-muted">No hay colas de reproducción activas.</p>';
+                }
+                
+                // Mostrar servidores
+                const serversContainer = document.getElementById('servers-container');
+                if (data.servers.length > 0) {
+                    let html = '';
+                    data.servers.forEach(server => {
+                        const isActive = data.voice_channels.some(vc => vc.server_id === server.id);
+                        const voiceChannel = data.voice_channels.find(vc => vc.server_id === server.id);
+                        const channelId = voiceChannel ? voiceChannel.id : null;
+                        
+                        // Verificar si el modo radio está activo para este servidor
+                        const currentSong = data.current_songs[server.id];
+                        const radioActive = currentSong && currentSong.radio_mode;
+                        
+                        // Obtener lista de oyentes para este canal
+                        const channelListeners = channelId ? data.listeners[channelId] || [] : [];
+                        
+                        html += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card server-card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <span class="status-indicator ${isActive ? 'status-online' : 'status-offline'}"></span>
+                                            ${server.name}
+                                            ${radioActive ? '<span class="radio-badge">Radio</span>' : ''}
+                                        </h5>
+                                        <p class="card-text">
+                                            <small class="text-muted">ID: ${server.id}</small>
+                                        </p>
+                                        <p class="card-text">
+                                            <i class="bi bi-people-fill"></i> ${server.member_count || 'N/A'} miembros
+                                        </p>
+                                        ${isActive ? `
+                                            <p class="card-text">
+                                                <i class="bi bi-broadcast"></i> Canal: ${voiceChannel.name || 'Desconocido'}
+                                            </p>
+                                            ${channelListeners.length > 0 ? `
+                                                <p class="card-text">
+                                                    <i class="bi bi-headphones"></i> Oyentes:
+                                                    <ul class="listeners-list">
+                                                        ${channelListeners.map(listener => `<li>${listener.display_name || listener.name}</li>`).join('')}
+                                                    </ul>
+                                                </p>
+                                            ` : ''}
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    serversContainer.innerHTML = html;
+                } else {
+                    serversContainer.innerHTML = '<p class="text-muted">No hay servidores conectados.</p>';
+                }
+            } catch (error) {
+                console.error('Error al obtener estadísticas:', error);
+            }
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos iniciales
+            fetchStats();
+            
+            // Actualizar tiempo de actividad cada segundo
+            setInterval(updateUptime, 1000);
+            
+            // Actualizar estadísticas cada 10 segundos
+            setInterval(fetchStats, 10000);
+        });
+    </script>
+</body>
+</html>
